@@ -48,7 +48,7 @@
         android:layout_marginBottom="78dp"
         android:layout_toRightOf="@+id/textView2"
         android:layout_toEndOf="@+id/textView2"
-        android:hint="도착 역을 입력하세요." />
+        android:hint="@string/to_hint" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
         android:layout_marginBottom="35dp"
         android:layout_alignRight="@+id/edit_to"
         android:layout_alignEnd="@+id/edit_to"
-        android:hint="현재 위치한 역을 입력하세요." />
+        android:hint="@string/from_hint" />
 
     <Button
         android:layout_width="wrap_content"
