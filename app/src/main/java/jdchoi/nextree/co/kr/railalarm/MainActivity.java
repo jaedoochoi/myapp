@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -31,6 +32,8 @@ public class MainActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_search){
+            Toast.makeText(getApplicationContext(), "검색 메뉴가 선택되었습니다.", Toast.LENGTH_LONG).show();
         }
 
         return super.onOptionsItemSelected(item);
