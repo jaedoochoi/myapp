@@ -81,6 +81,7 @@
         android:id="@+id/btn_set"
         android:layout_alignTop="@+id/btn_init"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:onClick="onBtnSetClicked" />
 
 </RelativeLayout>

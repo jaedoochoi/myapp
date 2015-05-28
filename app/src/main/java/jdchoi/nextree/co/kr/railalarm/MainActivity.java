@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,8 @@ import jdchoi.nextree.co.kr.railalarm.helper.DatabaseHelper;
 public class MainActivity extends ActionBarActivity implements TextWatcher{
     //GUI관련 변수
     private AutoCompleteTextView from_text, to_text;
-    private int line_number;
+    private int line_number, from_etime, to_etime;
+    DatabaseHelper dbHelper;
     Cursor cursor;
     private String to_stId, from_stId;
 
@@ -48,7 +50,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
 
         //sqlite에 연결하여 선택한 호선의 역리스트를 가져온다.
         //역이름과 역의 코드번호를 같이 가져와야함.
-        DatabaseHelper dbHelper = new DatabaseHelper(this, line_number);
+        dbHelper = new DatabaseHelper(this, line_number);
         cursor = dbHelper.selectStationsInfo();
 
         final List<String> st_id = new ArrayList<String>();
@@ -158,4 +160,12 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
 
     }
 
+    public void onBtnSetClicked(View v){
+        if(from_stId.equals("") || to_stId.equals("")){
+            Toast.makeText(this, "출발역과 도착역을 입력하세요.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        int tot_spend_time = dbHelper.selectTotalSpendTime(from_stId, to_stId);
+    }
 }

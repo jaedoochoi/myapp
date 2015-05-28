@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,6 +64,24 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return db.rawQuery(query, null);
     }
 
+    //역의 출발역과 도착역의 ID로 두 역사이의 역을 조회하여 총 소요시간을 계산한다.
+    public int selectTotalSpendTime(String from_stId, String to_stId){
+        String selectionArgs[] = {from_stId, to_stId};
+        query = "SELECT ST_ID, ST_ETIME, ST_EXTIME FROM "+ TABLE_NAME+
+                "WHERE ST_ID > ? AND ST_ID <= ?";
+
+        Cursor cursor = db.rawQuery(query, selectionArgs);
+        int tot_etime = 0;
+        while(cursor.moveToNext()){
+            int st_etime_idx = cursor.getColumnIndex("ST_ETIME");
+            tot_etime += cursor.getInt(st_etime_idx);
+        }
+
+        Log.d("tot_etime=========>", ""+tot_etime);
+        return tot_etime;
+    }
+
+    //앱의 DB정보를 외부저장소로 복사하여 외부저장소를 사용하기 위함.
     public String doCopy(AssetManager am) {
 
         File outDir=null, outFile = null;
