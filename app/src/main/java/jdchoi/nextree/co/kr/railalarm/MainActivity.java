@@ -89,6 +89,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
                 String name_txt = (String) parent.getItemAtPosition(position);
 
                 for (int i = 0; i < st_name.size(); i++) {
+                    String value = st_name.get(i);
                     if (value.equals(name_txt)) {
                         from_stId = st_id.get(i);
                         continue;
@@ -110,6 +111,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
                 String name_txt = (String) parent.getItemAtPosition(position);
 
                 for (int i = 0; i < st_name.size(); i++) {
+                    String value = st_name.get(i);
                     if (value.equals(name_txt)) {
                         to_stId = st_id.get(i);
                         continue;
