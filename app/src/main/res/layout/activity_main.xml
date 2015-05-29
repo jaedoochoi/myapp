@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/edit_to"
-        android:layout_above="@+id/btn_init"
+        android:layout_above="@+id/btn_cancel"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="78dp"
@@ -68,20 +68,22 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="초기화"
-        android:id="@+id/btn_init"
+        android:text="알람해제"
+        android:id="@+id/btn_cancel"
+        android:layout_marginBottom="94dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="88dp" />
+        android:layout_alignRight="@+id/edit_to"
+        android:layout_alignEnd="@+id/edit_to"
+        android:onClick="onBtnCancelClicked" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="설정"
+        android:text="알람설정"
         android:id="@+id/btn_set"
-        android:layout_alignTop="@+id/btn_init"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="onBtnSetClicked" />
+        android:onClick="onBtnSetClicked"
+        android:layout_below="@+id/edit_to"
+        android:layout_toLeftOf="@+id/btn_cancel"
+        android:layout_toStartOf="@+id/btn_cancel" />
 
 </RelativeLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RailAlarm</string>
+    <string name="app_name">지하철 알람</string>
 
     <string name="from_hint">현재 위치한 역을 입력하세요.</string>
     <string name="to_hint">도착할 역을 입력하세요.</string>

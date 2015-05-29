@@ -5,13 +5,8 @@ import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-import android.util.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import jdchoi.nextree.co.kr.railalarm.jdchoi.nextree.co.kr.railalarm.util.DatabaseUtil;
 
 /**
  * Created by Administrator on 2015-05-28.
@@ -32,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         //Assets에 위치한 데이터베이스 파일에 접근하기 위해 AssetManager를 얻는다.
         assetManager = context.getAssets();
         //데이터베이스 파일에 접근하기위해 assets에 위치한 DB파일을 외장메모리에 복사한다.
-        EXTERNAL_DB_PATH = doCopy(assetManager);
+        EXTERNAL_DB_PATH = DatabaseUtil.doCopy(assetManager);
 
         db = SQLiteDatabase.openDatabase(EXTERNAL_DB_PATH+"/"+DATA_BASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
 
@@ -57,73 +52,34 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     }
 
-    //역정보 조회 관련 함수
+    /*
+     *  역정보 조회 관련 함수
+     */
     public Cursor selectStationsInfo(){
         query = "SELECT ST_ID, ST_NAME, ST_ETIME, ST_EXTIME FROM "+TABLE_NAME;
 
         return db.rawQuery(query, null);
     }
 
-    //역의 출발역과 도착역의 ID로 두 역사이의 역을 조회하여 총 소요시간을 계산한다.
+    /*
+     *  역의 출발역과 도착역의 ID로 두 역사이의 역을 조회하여 총 소요시간을 계산하는 함수.
+     */
     public int selectTotalSpendTime(String from_stId, String to_stId){
-        String selectionArgs[] = {from_stId, to_stId};
-        query = "SELECT ST_ID, ST_ETIME, ST_EXTIME FROM "+ TABLE_NAME+
-                "WHERE ST_ID > ? AND ST_ID <= ?";
+        //상행일 경우 출발역의 소요시간을 포함하지 않고
+        //하행일 경우 출발역의 소요시간을 포함한다.
+        query = "SELECT ST_ID, ST_ETIME, ST_EXTIME FROM "+ TABLE_NAME;
+        if(Integer.valueOf(from_stId) - Integer.valueOf(to_stId) > 0){
+            query += " WHERE ST_ID <= ? AND ST_ID > ?";
+        } else {
+            query += " WHERE ST_ID > ? AND ST_ID <= ?";
+        }
 
-        Cursor cursor = db.rawQuery(query, selectionArgs);
+        Cursor cursor = db.rawQuery(query, new String[] {from_stId, to_stId});
         int tot_etime = 0;
         while(cursor.moveToNext()){
             int st_etime_idx = cursor.getColumnIndex("ST_ETIME");
             tot_etime += cursor.getInt(st_etime_idx);
         }
-
-        Log.d("tot_etime=========>", ""+tot_etime);
         return tot_etime;
-    }
-
-    //앱의 DB정보를 외부저장소로 복사하여 외부저장소를 사용하기 위함.
-    public String doCopy(AssetManager am) {
-
-        File outDir=null, outFile = null;
-        String sdCardDir = Environment.getExternalStorageDirectory().getAbsolutePath();//"/storage/extSdCard/Android";
-
-        // 외장메모리가 사용가능 상태인지 확인
-        if ( Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ) {
-
-            outDir = new File( sdCardDir, "/data/jdchoi.nextree.co.kr.railalarm/databases");
-            sdCardDir += "/data/jdchoi.nextree.co.kr.railalarm/databases";
-
-            outDir.mkdirs();
-
-            outFile = new File(outDir, "RailAlarm.db");
-
-            InputStream is = null;
-            OutputStream os = null;
-
-            int size;
-
-            try {
-                // AssetsManager를 이용하여 RailAlarm.db파일 읽기
-                is = am.open("RailAlarm.db");
-                size = is.available();
-
-                outFile.createNewFile();           // 디렉토리 생성
-
-                os = new FileOutputStream(outFile);
-
-                byte[] buffer = new byte[size];
-
-                is.read(buffer);
-
-                os.write(buffer);
-
-                is.close();
-                os.close();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return sdCardDir;
     }
 }
