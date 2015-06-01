@@ -20,7 +20,7 @@ public class AlarmReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         //도착 알림시 사운드 출력.
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+        //if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             try {
                 if (mp != null) {
                     mp.release();
@@ -35,7 +35,7 @@ public class AlarmReceiver extends BroadcastReceiver{
             }
 
             showNotification(context, intent);
-        }
+        //}
     }
 
     private void showNotification(Context context, Intent intent) {

@@ -2,17 +2,14 @@ package jdchoi.nextree.co.kr.railalarm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -185,14 +182,14 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
         //알람 매니저를 취득
         alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        //브로드 케스팅을 활성화 한다.
+        /*브로드 케스팅을 활성화 한다.
         ComponentName receiver = new ComponentName(this, AlarmReceiver.class);
         PackageManager pm = this.getPackageManager();
 
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
-
+        */
         // 브로드캐스팅을 수행할 PendingIntent를 조회한다.
         Intent intent = new Intent(this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
@@ -206,21 +203,22 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
      * 해제 버튼 클릭시 발생하는 이벤트함수.
      */
     public void onBtnCancelClicked(View v){
-        Log.d("MainActivity", "onBtnCancelClicked() 호출됨.");
+
         if(alarmManager != null) {
             alarmManager.cancel(pendingIntent);
             alarmManager = null;
         }
 
-        //브로드 케스팅을 비활성화 한다.
+        /*브로드 케스팅을 비활성화 한다.
         ComponentName receiver = new ComponentName(this, AlarmReceiver.class);
         PackageManager pm = this.getPackageManager();
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
-
+        */
         from_text.setText("");
         to_text.setText("");
+
         Toast.makeText(getApplicationContext(), "알람이 해제 되었습니다.", Toast.LENGTH_LONG).show();
     }
 

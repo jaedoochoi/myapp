@@ -21,10 +21,12 @@
             </intent-filter>
         </activity>
         <!-- Broadcast receiver -->
-        <receiver android:name=".AlarmReceiver" android:enabled="false">
+        <receiver android:name=".AlarmReceiver">
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
+            -->
         </receiver>
 
     </application>
