@@ -6,7 +6,8 @@
 
 
     <string-array name="line_arrays">
-        <item>1호선</item>
+        <item>1호선(천안)</item>
+        <item>1호선(인천)</item>
         <item>2호선</item>
         <item>3호선</item>
         <item>4호선</item>

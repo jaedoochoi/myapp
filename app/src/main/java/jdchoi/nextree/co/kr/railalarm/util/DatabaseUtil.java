@@ -1,4 +1,4 @@
-package jdchoi.nextree.co.kr.railalarm.jdchoi.nextree.co.kr.railalarm.util;
+package jdchoi.nextree.co.kr.railalarm.util;
 
 import android.content.res.AssetManager;
 import android.os.Environment;

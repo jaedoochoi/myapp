@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import jdchoi.nextree.co.kr.railalarm.jdchoi.nextree.co.kr.railalarm.util.DatabaseUtil;
+import jdchoi.nextree.co.kr.railalarm.domain.AlarmStations;
+import jdchoi.nextree.co.kr.railalarm.util.AlarmStationsMaker;
+import jdchoi.nextree.co.kr.railalarm.util.DatabaseUtil;
 
 /**
  * Created by Administrator on 2015-05-28.
@@ -21,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     private String query;
     private AssetManager assetManager;
 
-    public DatabaseHelper(Context context, int lineNumber){
+    public DatabaseHelper(Context context){
         //생성과 동시에 데이터베이스를 준비한다.
         super(context, DATA_BASE_NAME, null, DATA_BASE_VERSION);
         //Assets에 위치한 데이터베이스 파일에 접근하기 위해 AssetManager를 얻는다.
@@ -30,17 +32,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         EXTERNAL_DB_PATH = DatabaseUtil.doCopy(assetManager);
 
         db = SQLiteDatabase.openDatabase(EXTERNAL_DB_PATH+"/"+DATA_BASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
-
-        switch (lineNumber){
-           case 2: TABLE_NAME = "STATION_LINE2_TB";
-               break;
-           case 3: TABLE_NAME = "STATION_LINE3_TB";
-               break;
-           case 4: TABLE_NAME = "STATION_LINE4_TB";
-               break;
-           default:
-               break;
-        }
     }
 
     @Override
@@ -55,10 +46,14 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     /*
      *  역정보 조회 관련 함수
      */
-    public Cursor selectStationsInfo(){
+    public AlarmStations selectStationsInfo(int lineNumber){
+        setTableName(lineNumber);
+
         query = "SELECT ST_ID, ST_NAME, ST_ETIME, ST_EXTIME FROM "+TABLE_NAME;
 
-        return db.rawQuery(query, null);
+        Cursor cursor = db.rawQuery(query, null);
+
+        return AlarmStationsMaker.make(cursor);
     }
 
     /*
@@ -78,8 +73,37 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         int tot_etime = 0;
         while(cursor.moveToNext()){
             int st_etime_idx = cursor.getColumnIndex("ST_ETIME");
-            tot_etime += cursor.getInt(st_etime_idx);
+            //테스트 결과 시간이 예상보다 많이 안맞는 경우가 발생함.
+            //조정이 필요하여 2분 이상인 역의 경우 1분씩 줄임. 출퇴근 시간에 열차가 평소보다 빨리 움직이나?
+            int modify_tot_etime = cursor.getInt(st_etime_idx);
+            if(modify_tot_etime > 2){
+                modify_tot_etime -= 1;
+            }
+            tot_etime += modify_tot_etime;
         }
         return tot_etime;
+    }
+
+    private void setTableName(int lineNumber){
+        switch (lineNumber){
+            case 1:
+                this.TABLE_NAME = "STATION_LINE1_TB";
+                break;
+            case 2:
+                this.TABLE_NAME = "STATION_LINE1_ICH_TB";
+                break;
+            case 3:
+                this.TABLE_NAME = "STATION_LINE2_TB";
+                break;
+            case 4:
+                this.TABLE_NAME = "STATION_LINE3_TB";
+                break;
+            case 5:
+                this.TABLE_NAME = "STATION_LINE4_TB";
+                break;
+            default:
+                this.TABLE_NAME = "STATION_LINE1_TB";
+                break;
+        }
     }
 }
