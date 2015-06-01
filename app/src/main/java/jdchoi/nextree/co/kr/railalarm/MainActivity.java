@@ -208,7 +208,8 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
         pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
 
-        Toast.makeText(getApplicationContext(), "알람이 설정 되었습니다. 알람은 다소 정확하지 않을 수 있습니다.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "알람이 설정 되었습니다. 알람시간은 "+tot_spend_time+"분 입니다.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "알람이 설정 되었습니다. 알람은 다소 정확하지 않을 수 있습니다.", Toast.LENGTH_LONG).show();
 
     }
 
