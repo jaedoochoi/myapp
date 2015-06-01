@@ -28,8 +28,8 @@ public class AlarmReceiver extends BroadcastReceiver{
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-                        .setContentTitle("알 림")
-                        .setContentText("일어나세요!  이제 내리실 준비 하세요.");
+                        .setContentTitle("지하철알람")
+                        .setContentText("일어나세요! 곧 내리실 역입니다.");
         mBuilder.setContentIntent(contentIntent);
         mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
         //내장사운드 출력함.//
