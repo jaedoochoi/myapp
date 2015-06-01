@@ -1,8 +1,10 @@
 package jdchoi.nextree.co.kr.railalarm;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -29,7 +31,7 @@ import jdchoi.nextree.co.kr.railalarm.helper.DatabaseHelper;
 public class MainActivity extends ActionBarActivity implements TextWatcher{
     //GUI관련 변수
     private AutoCompleteTextView from_text, to_text;
-    private int line_number, from_etime, to_etime;
+    private int line_number, from_etime, to_etime, back_press_cnt;
     private DatabaseHelper dbHelper;
     private String to_stId = "", from_stId = "";
 
@@ -47,7 +49,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        back_press_cnt = 0;
         from_text = (AutoCompleteTextView) findViewById(R.id.edit_from);
         to_text = (AutoCompleteTextView) findViewById(R.id.edit_to);
 
@@ -68,6 +70,8 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
 
                 //호선이 바뀌었을 경우 역정보를 다시 조회함.
                 if (line_number != position + 1) {
+                    from_text.setText("");
+                    to_text.setText("");
                     line_number = position + 1;
 
                     alarmStations = dbHelper.selectStationsInfo(line_number);
@@ -83,7 +87,20 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
                             android.R.layout.simple_spinner_dropdown_item,
                             stNameList
                     ));
-                    from_text.setTextColor(Color.BLUE);
+
+                    if(line_number == 1 || line_number ==2) {
+                        from_text.setTextColor(Color.rgb(0, 73, 139));
+                        to_text.setTextColor(Color.rgb(0, 73, 139));
+                    }else if(line_number == 3){
+                        from_text.setTextColor(Color.rgb(0, 146, 70));
+                        to_text.setTextColor(Color.rgb(0, 146, 70));
+                    }else if(line_number == 4){
+                        from_text.setTextColor(Color.rgb(243, 102, 48));
+                        to_text.setTextColor(Color.rgb(243, 102, 48));
+                    }else if(line_number == 5){
+                        from_text.setTextColor(Color.rgb(0, 162, 209));
+                        to_text.setTextColor(Color.rgb(0, 162, 209));
+                    }
 
                     from_text.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -104,7 +121,6 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
                             android.R.layout.simple_spinner_dropdown_item,
                             stNameList
                     ));
-                    to_text.setTextColor(Color.RED);
 
                     to_text.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -147,10 +163,10 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_exit) {
+            finish();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -196,6 +212,34 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
 
     }
 
+    private AlertDialog createDialogBox(String title, String message){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+
+        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(alarmManager != null) {
+                    alarmManager.cancel(pendingIntent);
+                    alarmManager = null;
+                 }
+                finish();
+            }
+        });
+
+        builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        AlertDialog dialog =  builder.create();
+        return dialog;
+    }
+
     /*
      * 해제 버튼 클릭시 발생하는 이벤트함수.
      */
@@ -204,12 +248,32 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
         if(alarmManager != null) {
             alarmManager.cancel(pendingIntent);
             alarmManager = null;
+
+            from_text.setText("");
+            to_text.setText("");
+
+            Toast.makeText(getApplicationContext(), "알람이 해제 되었습니다.", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(getApplicationContext(), "설정된 알람이 없습니다.", Toast.LENGTH_LONG).show();
         }
-
-        from_text.setText("");
-        to_text.setText("");
-
-        Toast.makeText(getApplicationContext(), "알람이 해제 되었습니다.", Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void onBackPressed() {
+        back_press_cnt++;
+        if(back_press_cnt >= 2){
+            String title = "지하철알람";
+            String message = "앱을 종료하시겠습니까?";
+            AlertDialog dialog = createDialogBox(title, message);
+            dialog.show();
+        }else{
+            Toast.makeText(getApplicationContext(), "한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_LONG).show();
+            return;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 }

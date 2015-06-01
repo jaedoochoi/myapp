@@ -1,89 +1,94 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
-
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/line_spinner"
-        android:spinnerMode="dropdown"
-        android:layout_above="@+id/textView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:entries="@array/line_arrays"
-        android:layout_marginBottom="66dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="출발역:"
-        android:id="@+id/textView"
-        android:textSize="20dp"
-        android:layout_alignTop="@+id/edit_from"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="@android:color/black" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="도착역:"
-        android:id="@+id/textView2"
-        android:textSize="20dp"
-        android:layout_alignTop="@+id/edit_to"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="@android:color/black" />
-
-    <AutoCompleteTextView
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/edit_to"
-        android:layout_above="@+id/btn_cancel"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="78dp"
-        android:layout_toRightOf="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2"
-        android:completionThreshold="1"
-        android:hint="@string/to_hint" />
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp"
+        android:gravity="right"
+        android:layout_gravity="right">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="호선: "
+            android:textSize="20dp"
+            android:textColor="@android:color/black"
+            android:layout_gravity="right" />
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/line_spinner"
+            android:spinnerMode="dropdown"
+            android:entries="@array/line_arrays"
+            android:layout_marginBottom="60dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+    </LinearLayout>
 
-    <AutoCompleteTextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/edit_from"
-        android:layout_above="@+id/textView2"
-        android:layout_toRightOf="@+id/textView2"
-        android:layout_marginBottom="35dp"
-        android:layout_alignRight="@+id/edit_to"
-        android:layout_alignEnd="@+id/edit_to"
-        android:completionThreshold="1"
-        android:hint="@string/from_hint" />
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="출발역: "
+            android:id="@+id/textView"
+            android:textSize="20dp"
+            android:textColor="@android:color/black" />
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_from"
+            android:layout_marginBottom="60dp"
+            android:completionThreshold="1"
+            android:hint="@string/from_hint" />
 
-    <Button
-        android:layout_width="wrap_content"
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="알람해제"
-        android:id="@+id/btn_cancel"
-        android:layout_marginBottom="94dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/edit_to"
-        android:layout_alignEnd="@+id/edit_to"
-        android:onClick="onBtnCancelClicked" />
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="도착역: "
+            android:id="@+id/textView2"
+            android:textSize="20dp"
+            android:textColor="@android:color/black" />
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_to"
+            android:layout_marginBottom="80dp"
+            android:completionThreshold="1"
+            android:hint="@string/to_hint" />
 
-    <Button
-        android:layout_width="wrap_content"
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="알람설정"
-        android:id="@+id/btn_set"
-        android:onClick="onBtnSetClicked"
-        android:layout_below="@+id/edit_to"
-        android:layout_toLeftOf="@+id/btn_cancel"
-        android:layout_toStartOf="@+id/btn_cancel" />
-
-</RelativeLayout>
+        android:orientation="horizontal"
+        android:gravity="right">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="알람설정"
+            android:id="@+id/btn_set"
+            android:onClick="onBtnSetClicked"
+            android:layout_marginRight="20dp" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="알람해제"
+            android:id="@+id/btn_cancel"
+            android:onClick="onBtnCancelClicked"
+            android:layout_marginRight="10dp" />
+    </LinearLayout>
+</LinearLayout>
