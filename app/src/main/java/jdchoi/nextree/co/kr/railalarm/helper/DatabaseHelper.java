@@ -93,12 +93,15 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 this.TABLE_NAME = "STATION_LINE1_ICH_TB";
                 break;
             case 3:
-                this.TABLE_NAME = "STATION_LINE2_TB";
+                this.TABLE_NAME = "STATION_LINE2_INN_TB";
                 break;
             case 4:
-                this.TABLE_NAME = "STATION_LINE3_TB";
+                this.TABLE_NAME = "STATION_LINE2_OUT_TB";
                 break;
             case 5:
+                this.TABLE_NAME = "STATION_LINE3_TB";
+                break;
+            case 6:
                 this.TABLE_NAME = "STATION_LINE4_TB";
                 break;
             default:
