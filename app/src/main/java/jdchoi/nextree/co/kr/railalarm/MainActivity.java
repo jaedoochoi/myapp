@@ -251,7 +251,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
     }
 
     /*
-     * 설정버튼 클릭시 발생하는 이벤트함수.
+     * 알람설정버튼 클릭시 발생하는 이벤트함수.
      */
     public void onBtnSetClicked(View v){
         if(from_stId.equals("") || to_stId.equals("")){
@@ -273,7 +273,8 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
         pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
 
-        Toast.makeText(getApplicationContext(), "알람이 설정 되었습니다. 설정된 시간은 "+ tot_spend_time+"분 입니다.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "알람이 설정 되었습니다. 알람시간은 "+tot_spend_time+"분 입니다.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "알람이 설정 되었습니다. 알람은 다소 정확하지 않을 수 있습니다.", Toast.LENGTH_LONG).show();
 
     }
 
@@ -306,7 +307,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
     }
 
     /*
-     * 해제 버튼 클릭시 발생하는 이벤트함수.
+     * 알람해제 버튼 클릭시 발생하는 이벤트함수.
      */
     public void onBtnCancelClicked(View v){
 
