@@ -7,10 +7,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,12 +29,15 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import jdchoi.nextree.co.kr.railalarm.domain.AlarmStations;
 import jdchoi.nextree.co.kr.railalarm.enm.Line;
 import jdchoi.nextree.co.kr.railalarm.helper.DatabaseHelper;
+import jdchoi.nextree.co.kr.railalarm.helper.GooglePlaceConnectionHelper;
 
 
-public class MainActivity extends ActionBarActivity implements TextWatcher{
+public class MainActivity extends ActionBarActivity implements TextWatcher {
     //GUI관련 변수
     private AutoCompleteTextView from_text, to_text;
     private int line_number, from_etime, to_etime, back_press_cnt;
@@ -42,6 +51,10 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
     private AlarmStations alarmStations;
 
     //알람관련 변수
+    private HttpsURLConnection client;
+
+    private  LocationManager locationManager;
+    private Location location;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
 
@@ -49,6 +62,23 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+
+            //Network를 통하여 위치정보를 얻는다.
+            startLocationService();
+
+            // Gets the URL from the UI's text field.
+            String stringUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/output?";
+            if (networkInfo != null && networkInfo.isConnected()) {
+               GooglePlaceConnectionHelper helper =  new GooglePlaceConnectionHelper(location);
+                helper.execute(stringUrl);
+            }
+        }
+
         back_press_cnt = 0;
         from_text = (AutoCompleteTextView) findViewById(R.id.edit_from);
         to_text = (AutoCompleteTextView) findViewById(R.id.edit_to);
@@ -88,16 +118,16 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
                             stNameList
                     ));
 
-                    if(line_number == 1 || line_number ==2) {
+                    if (line_number == 1 || line_number == 2) {
                         from_text.setTextColor(Color.rgb(0, 73, 139));
                         to_text.setTextColor(Color.rgb(0, 73, 139));
-                    }else if(line_number == 3){
+                    } else if (line_number == 3) {
                         from_text.setTextColor(Color.rgb(0, 146, 70));
                         to_text.setTextColor(Color.rgb(0, 146, 70));
-                    }else if(line_number == 4){
+                    } else if (line_number == 4) {
                         from_text.setTextColor(Color.rgb(243, 102, 48));
                         to_text.setTextColor(Color.rgb(243, 102, 48));
-                    }else if(line_number == 5){
+                    } else if (line_number == 5) {
                         from_text.setTextColor(Color.rgb(0, 162, 209));
                         to_text.setTextColor(Color.rgb(0, 162, 209));
                     }
@@ -146,6 +176,41 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
             }
         });
 
+    }
+
+    /**
+     *
+     */
+    private void startLocationService() {
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+        String msg = "Last known Location = > Latitude: "+location.getLatitude()+"  longitute: "+location.getLongitude();
+        Log.d("TAG: ", msg);
+
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                location = location;
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        });
+
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -276,4 +341,5 @@ public class MainActivity extends ActionBarActivity implements TextWatcher{
     protected void onStop() {
         super.onStop();
     }
+
 }
