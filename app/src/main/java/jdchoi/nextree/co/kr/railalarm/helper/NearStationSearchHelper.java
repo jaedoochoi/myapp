@@ -56,7 +56,7 @@ public class NearStationSearchHelper extends AsyncTask<String, String, String> {
                     .append("apikey=").append(API_KEY)
                     .append("&code=SW8")
                     .append("&location=").append(location.getLatitude()).append(",").append(location.getLongitude())
-                    .append("&radius=100").toString());
+                    .append("&radius=300").toString());
 
                     //Google Place한글화 될때까지 주석처리함.
                     //.append("key=").append(API_KEY)
