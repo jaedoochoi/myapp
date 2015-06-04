@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,13 +27,14 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import jdchoi.nextree.co.kr.railalarm.domain.AlarmStations;
 import jdchoi.nextree.co.kr.railalarm.enm.Line;
 import jdchoi.nextree.co.kr.railalarm.helper.DatabaseHelper;
-import jdchoi.nextree.co.kr.railalarm.helper.GooglePlaceConnectionHelper;
+import jdchoi.nextree.co.kr.railalarm.helper.NearStationSearchHelper;
 
 
 public class MainActivity extends ActionBarActivity implements TextWatcher {
@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
     private AutoCompleteTextView from_text, to_text;
     private int line_number, from_etime, to_etime, back_press_cnt;
     private DatabaseHelper dbHelper;
-    private String to_stId = "", from_stId = "";
+    private String from_stName="", from_stId = "", to_stId = "";
 
     private List<String> stIdList = null;
     private List<String> stNameList = null;
@@ -63,25 +63,11 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-
-            //Network를 통하여 위치정보를 얻는다.
-            startLocationService();
-
-            // Gets the URL from the UI's text field.
-            String stringUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/output?";
-            if (networkInfo != null && networkInfo.isConnected()) {
-               GooglePlaceConnectionHelper helper =  new GooglePlaceConnectionHelper(location);
-                helper.execute(stringUrl);
-            }
-        }
-
         back_press_cnt = 0;
         from_text = (AutoCompleteTextView) findViewById(R.id.edit_from);
         to_text = (AutoCompleteTextView) findViewById(R.id.edit_to);
+
+        informationInit();
 
         //AutoCompleteTextView에 TextWatcher를 셋팅한다.
         from_text.addTextChangedListener(this);
@@ -100,7 +86,7 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
 
                 //호선이 바뀌었을 경우 역정보를 다시 조회함.
                 if (line_number != position + 1) {
-                    from_text.setText("");
+                    from_text.setText(from_stName);
                     to_text.setText("");
                     line_number = position + 1;
 
@@ -110,6 +96,14 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
                     stNameList = alarmStations.getStName();
                     stEtimeList = alarmStations.getEtime();
                     stExtimeList = alarmStations.getExtime();
+
+                    for (int i = 0; i < stNameList.size(); i++) {
+                        String value = stNameList.get(i);
+                        if (value.equals(from_stName)) {
+                            from_stId = stIdList.get(i);
+                            continue;
+                        }
+                    }
 
                     //AutoCompleteTextView에 자동으로 검색되도록 검색할 단어들을 ArrayAdapter로 만들어 인수로 넘긴다.
                     from_text.setAdapter(new ArrayAdapter<String>(
@@ -121,13 +115,13 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
                     if (line_number == 1 || line_number == 2) {
                         from_text.setTextColor(Color.rgb(0, 73, 139));
                         to_text.setTextColor(Color.rgb(0, 73, 139));
-                    } else if (line_number == 3) {
+                    } else if (line_number == 3 || line_number == 4) {
                         from_text.setTextColor(Color.rgb(0, 146, 70));
                         to_text.setTextColor(Color.rgb(0, 146, 70));
-                    } else if (line_number == 4) {
+                    } else if (line_number == 5) {
                         from_text.setTextColor(Color.rgb(243, 102, 48));
                         to_text.setTextColor(Color.rgb(243, 102, 48));
-                    } else if (line_number == 5) {
+                    } else if (line_number == 6) {
                         from_text.setTextColor(Color.rgb(0, 162, 209));
                         to_text.setTextColor(Color.rgb(0, 162, 209));
                     }
@@ -178,15 +172,38 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
 
     }
 
+    private void informationInit() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+
+            //1. Network를 통하여 위치정보를 얻는다.
+            startLocationService();
+
+            if (networkInfo != null && networkInfo.isConnected()) {
+               NearStationSearchHelper helper =  new NearStationSearchHelper(this, location);
+                helper.execute();
+                try {
+                    from_stName = helper.get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            //네트워크에 접속 할 수 없을 경우 사용자에게 직접 입력을 유도한다.
+            Toast.makeText(getApplicationContext(), "네트워크에 접속할 수 없습니다. 출발역을 입력해 주세요.", Toast.LENGTH_LONG).show();
+        }
+    }
+
     /**
      *
      */
     private void startLocationService() {
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-        String msg = "Last known Location = > Latitude: "+location.getLatitude()+"  longitute: "+location.getLongitude();
-        Log.d("TAG: ", msg);
 
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
             @Override
@@ -209,8 +226,6 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
 
             }
         });
-
-        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -315,7 +330,21 @@ public class MainActivity extends ActionBarActivity implements TextWatcher {
             alarmManager.cancel(pendingIntent);
             alarmManager = null;
 
-            from_text.setText("");
+            from_stName = "";
+
+            informationInit();
+
+            if(stNameList != null && stNameList.size() > 0) {
+                for (int i = 0; i < stNameList.size(); i++) {
+                    String value = stNameList.get(i);
+                    if (value.equals(from_stName)) {
+                        from_stId = stIdList.get(i);
+                        continue;
+                    }
+                }
+            }
+
+            from_text.setText(from_stName);
             to_text.setText("");
 
             Toast.makeText(getApplicationContext(), "알람이 해제 되었습니다.", Toast.LENGTH_LONG).show();
